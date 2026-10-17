@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BizGuard – SME Cybersecurity Assistant</title>
+<style>
+:root{--bg:#0b0f1a;--panel:#12172a;--p2:#1a2240;--ink:#e9edf5;--sub:#8892a6;--accent:#4d8dff;--good:#2ecc71;--warn:#f5a623;--bad:#ef4b5f;--bd:#232b45;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+[data-theme="light"]{--bg:#f1f4f8;--panel:#fff;--p2:#eef2f8;--ink:#16202b;--sub:#5b6b7a;--bd:#dde3ec}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:13.5px/1.45 -apple-system,Segoe UI,Roboto,sans-serif;transition:background .2s,color .2s}
+.top{display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--bg);z-index:5}
+.brand{font-weight:700;font-size:15px;white-space:nowrap}.brand b{color:var(--accent)}
+.nav{display:flex;gap:4px;overflow-x:auto;flex:1}
+.nav a{padding:7px 12px;border-radius:8px;color:var(--sub);cursor:pointer;font-size:12.5px;white-space:nowrap}
+.nav a.on{background:var(--p2);color:var(--ink)}
+.top-actions{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.theme-btn{background:var(--p2);border:1px solid var(--bd);border-radius:8px;color:var(--ink);padding:6px 10px;cursor:pointer;font-size:13px}
+.main{padding:20px;max-width:1150px;margin:0 auto}
+h1{font-size:17px;margin:0 0 4px}.mut{color:var(--sub);font-size:12.5px;margin:0 0 16px}
+.scr{display:none}.scr.on{display:block}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:14px}
+.stat,.pn{background:var(--panel);border:1px solid var(--bd);border-radius:12px;padding:14px}
+.stat .l{color:var(--sub);font-size:11px}.stat .n{font-size:20px;font-weight:700;margin:3px 0}
+.spark{display:flex;align-items:flex-end;gap:2px;height:20px}.spark i{flex:1;background:var(--accent);opacity:.75;border-radius:1px}
+.g2{display:grid;grid-template-columns:1.1fr 1fr;gap:14px;margin-bottom:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.pn h3{font-size:13px;margin:0 0 12px}
+.row{margin-bottom:11px}.row .t{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;gap:8px}
+.tr{height:7px;background:var(--bd);border-radius:4px;overflow:hidden}.tr i{display:block;height:100%;border-radius:4px}
+.li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd);font-size:12.5px}.li:last-child{border:0}
+.pill{padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:600;white-space:nowrap}
+.crit,.bad{background:rgba(239,75,95,.15);color:var(--bad)}.high,.warn{background:rgba(245,166,35,.15);color:var(--warn)}
+.med{background:rgba(77,141,255,.15);color:var(--accent)}.ok,.good{background:rgba(46,204,113,.15);color:var(--good)}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:8px 14px;font-size:12.5px;cursor:pointer}
+.btn.g{background:var(--p2);color:var(--ink)}.btn.sm{padding:4px 10px;font-size:11.5px}
+.btn.red{background:var(--bad)}
+textarea,input,select{width:100%;background:var(--bg);color:var(--ink);border:1px solid var(--bd);border-radius:8px;padding:8px 10px;font:inherit;font-size:12.5px}
+textarea{min-height:110px;resize:vertical}
+label{font-size:11.5px;color:var(--sub);display:block;margin:0 0 3px}
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px}
+.res{margin-top:12px;border-left:3px solid var(--bad);background:var(--bg);padding:12px;border-radius:6px}
+.big{font-size:22px;font-weight:700}
+.chip{display:inline-block;border-radius:5px;padding:2px 7px;margin:4px 4px 0 0;font-size:11px;background:rgba(239,75,95,.13);color:var(--bad)}
+mark{background:rgba(239,75,95,.22);color:inherit;border-bottom:2px solid var(--bad);padding:0 1px}
+.mail{white-space:pre-wrap;border:1px solid var(--bd);border-radius:8px;padding:12px;background:var(--bg);line-height:1.9}
+.seg{cursor:pointer;border-radius:3px;padding:1px 0}.seg:hover{background:var(--p2)}.seg.sel{background:rgba(77,141,255,.3);outline:1px solid var(--accent)}
+.seg.hit{background:rgba(46,204,113,.25)}.seg.miss{background:rgba(239,75,95,.25)}.seg.wrong{text-decoration:line-through;background:rgba(245,166,35,.25)}
+.sw{width:38px;height:21px;border-radius:12px;background:var(--bd);position:relative;border:0;cursor:pointer;flex-shrink:0}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:15px;height:15px;border-radius:50%;background:#fff;transition:.15s}
+.sw.on{background:var(--good)}.sw.on::after{left:20px}
+.fab{position:fixed;bottom:20px;right:20px;width:50px;height:50px;border-radius:50%;background:var(--accent);color:#fff;font-size:21px;border:0;cursor:pointer;z-index:20;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.chat{position:fixed;bottom:80px;right:20px;width:340px;max-width:calc(100vw - 28px);background:var(--panel);border:1px solid var(--bd);border-radius:14px;display:none;flex-direction:column;z-index:20;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.chat.on{display:flex}.ch{padding:11px 14px;border-bottom:1px solid var(--bd);font-weight:600;font-size:13px}.ch span{font-weight:400;color:var(--sub);font-size:11px}
+.cb{padding:12px;display:flex;flex-direction:column;gap:8px;height:300px;overflow-y:auto}
+.m{font-size:12px;padding:8px 10px;border-radius:10px;max-width:90%;white-space:pre-wrap}.m.b{background:var(--p2);align-self:flex-start}.m.u{background:var(--accent);color:#fff;align-self:flex-end}
+.ci{display:flex;gap:6px;padding:8px;border-top:1px solid var(--bd)}.ci input{border:0;background:transparent}
+.sug{display:flex;gap:6px;flex-wrap:wrap;padding:0 12px 8px}.sug button{font-size:11px;background:var(--p2);color:var(--ink);border:0;border-radius:12px;padding:4px 9px;cursor:pointer}
+/* Incident response modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:30;display:none;align-items:center;justify-content:center}
+.modal-bg.on{display:flex}
+.modal{background:var(--panel);border:1px solid var(--bd);border-radius:14px;padding:20px;max-width:480px;width:calc(100vw - 40px);max-height:80vh;overflow-y:auto}
+.modal h2{font-size:15px;margin:0 0 12px}
+.step{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd)}.step:last-child{border:0}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-body{font-size:12.5px}
+/* Staff report card */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:14px}
+.card{background:var(--panel);border:1px solid var(--bd);border-radius:12px;padding:16px}
+.card .name{font-weight:700;font-size:14px;margin-bottom:2px}
+.card .role{color:var(--sub);font-size:11.5px;margin-bottom:10px}
+.score-ring{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;border:3px solid var(--bd);margin-bottom:10px}
+/* Scam history */
+.hist-item{padding:10px 0;border-bottom:1px solid var(--bd);font-size:12.5px}.hist-item:last-child{border:0}
+/* Weekly digest */
+.digest-section{margin-bottom:14px}
+.digest-section h4{font-size:12px;color:var(--sub);text-transform:uppercase;letter-spacing:.04em;margin:0 0 8px}
+.change-row{display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0}
+.up{color:var(--good)}.down{color:var(--bad)}
+@media(max-width:820px){.stats{grid-template-columns:repeat(2,1fr)}.g2,.g3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="brand">🛡️ Biz<b>Guard</b></div>
+  <div class="nav" id="nav">
+    <a class="on" data-s="dash">Dashboard</a>
+    <a data-s="chk">Scam Checker</a>
+    <a data-s="fin">Financial</a>
+    <a data-s="trn">Staff Training</a>
+    <a data-s="team">Team</a>
+    <a data-s="comp">Compliance</a>
+    <a data-s="staff">Staff Reports</a>
+    <a data-s="digest">Weekly Digest</a>
+    <a data-s="rep">Reports</a>
+  </div>
+  <div class="top-actions">
+    <button class="theme-btn" id="themeBtn" title="Toggle light/dark mode">☀️</button>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- DASHBOARD -->
+<div class="scr on" id="dash">
+  <h1>Security overview</h1><p class="mut" id="dsub"></p>
+  <div class="stats" id="stats"></div>
+  <div class="g2">
+    <div class="pn"><h3>Risk by business area</h3><div id="areas"></div></div>
+    <div class="pn">
+      <h3>Threat activity · 7 days</h3>
+      <svg id="chart" viewBox="0 0 300 140" width="100%" height="150" preserveAspectRatio="none"></svg>
+      <div class="mut" style="margin:8px 0 0"><span style="color:#ef4b5f">● Fraud</span> &nbsp;<span style="color:#f5a623">● Phishing</span> &nbsp;<span style="color:#4d8dff">● Account access</span></div>
+    </div>
+  </div>
+  <div class="g3">
+    <div class="pn"><h3>Top risks to fix</h3><div id="risks"></div></div>
+    <div class="pn">
+      <h3>Recent alerts <span class="mut" style="font-weight:400">· tap to resolve</span></h3>
+      <div id="alerts"></div>
+    </div>
+    <div class="pn"><h3>Data sources</h3><div class="mut">This build runs on data you enter or toggle (Team, Compliance, Financial). A production version would pull these automatically from Google Workspace, DNS lookups, breach databases and accounting exports.</div></div>
+  </div>
+</div>
+
+<!-- SCAM CHECKER -->
+<div class="scr" id="chk">
+  <h1>Scam &amp; invoice checker</h1>
+  <p class="mut">Paste an email, invoice, SMS or WhatsApp message. Works on English and Bahasa Malaysia patterns.</p>
+  <div class="pn">
+    <textarea id="ctext" placeholder="Paste a suspicious message here…"></textarea>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+      <button class="btn" id="cgo">Check risk</button>
+      <button class="btn g sm" data-ex="0">Example: supplier bank change</button>
+      <button class="btn g sm" data-ex="1">Example: parcel fee</button>
+      <button class="btn g sm" data-ex="2">Example: LHDN notice</button>
+      <button class="btn g sm" data-ex="3">Example: normal invoice</button>
+    </div>
+    <div id="cout"></div>
+  </div>
+  <!-- Scam history -->
+  <div class="pn" style="margin-top:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="margin:0">Check history</h3>
+      <button class="btn g sm" id="clearHist">Clear</button>
+    </div>
+    <div id="scamHist"><div class="mut">No checks saved yet.</div></div>
+  </div>
+</div>
+
+<!-- FINANCIAL -->
+<div class="scr" id="fin">
+  <h1>Financial security</h1>
+  <p class="mut">Scores each payment against your history. Transaction data here is simulated; enter your own to test.</p>
+  <div class="pn">
+    <div class="fg">
+      <div><label>Recipient</label><input id="fto" value="Supplier C"></div>
+      <div><label>Amount (RM)</label><input id="famt" type="number" value="8500"></div>
+      <div><label>Date &amp; time</label><input id="fdt" type="datetime-local"></div>
+      <div><label>Bank details recently changed?</label><select id="fchg"><option value="0">No</option><option value="1">Yes</option></select></div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" id="fgo">Score payment</button>
+      <button class="btn g" id="fdemo">Load demo: RM8,500 at 2:43 AM</button>
+    </div>
+    <div id="fout"></div>
+  </div>
+  <div class="pn" style="margin-top:14px"><h3>Payment history</h3><div id="fhist"></div></div>
+</div>
+
+<!-- STAFF TRAINING -->
+<div class="scr" id="trn">
+  <h1>Staff training</h1>
+  <p class="mut">Tap every part of the message you think is a red flag, then submit. Some parts are decoys that are perfectly normal.</p>
+  <div class="pn">
+    <div class="fg">
+      <div><label>Employee</label><select id="temp"></select></div>
+      <div><label>Scenario</label><select id="tsc"><option value="0">Supplier bank change email</option><option value="1">Parcel fee SMS</option><option value="2">Tax notice SMS</option></select></div>
+    </div>
+    <div class="mail" id="tmail"></div>
+    <div style="margin-top:10px"><button class="btn" id="tgo">Submit answers</button></div>
+    <div id="tout"></div>
+  </div>
+</div>
+
+<!-- TEAM -->
+<div class="scr" id="team">
+  <h1>Team &amp; access</h1>
+  <p class="mut">Toggle MFA, offboard leavers. Changes feed straight into your health score.</p>
+  <div class="pn">
+    <div id="elist"></div>
+    <div class="fg" style="margin-top:12px">
+      <div><label>New employee</label><input id="nn" placeholder="Name"></div>
+      <div><label>Role</label><input id="nr" placeholder="Role"></div>
+      <div style="align-self:end"><button class="btn" id="nadd">Add</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPLIANCE -->
+<div class="scr" id="comp">
+  <h1>Compliance &amp; hygiene checklist</h1>
+  <p class="mut" id="cpm"></p>
+  <div class="pn">
+    <div class="tr" style="height:9px;margin-bottom:12px"><i id="cbar" style="background:var(--accent)"></i></div>
+    <div id="clist"></div>
+  </div>
+</div>
+
+<!-- STAFF REPORTS -->
+<div class="scr" id="staff">
+  <h1>Staff report cards</h1>
+  <p class="mut">Individual security breakdown per team member — training scores, MFA status, and incidents.</p>
+  <div class="card-grid" id="staffCards"></div>
+</div>
+
+<!-- WEEKLY DIGEST -->
+<div class="scr" id="digest">
+  <h1>Weekly security digest</h1>
+  <p class="mut">A summary of what changed in your security posture over the past 7 days.</p>
+  <div id="digestBody"></div>
+</div>
+
+<!-- REPORTS -->
+<div class="scr" id="rep">
+  <h1>Trust report</h1>
+  <p class="mut">A shareable snapshot for banks, partners or investors.</p>
+  <div class="pn" id="rbody"></div>
+  <div style="margin-top:10px"><button class="btn" id="rdl" style="display:none">Download report</button></div>
+</div>
+
+</div><!-- end .main -->
+
+<!-- Incident response modal -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h2 id="modalTitle" style="margin:0">Incident Response</h2>
+      <button class="btn g sm" id="modalClose">✕ Close</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<button class="fab" id="fab" aria-label="Security assistant">💬</button>
+<div class="chat" id="chat">
+  <div class="ch">🛡️ Security Assistant <span>· answers from your live data</span></div>
+  <div class="cb" id="cb"><div class="m b">Hi! Ask me why your score is what it is, what to fix first, or how to handle a suspicious message.</div></div>
+  <div class="sug" id="sug">
+    <button>Why is my score this?</button>
+    <button>What should I fix first?</button>
+    <button>How do I set up DMARC?</button>
+  </div>
+  <div class="ci"><input id="cin" placeholder="Ask about your security…"><button class="btn sm" id="csend">Send</button></div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const KEY='bizguard-v2',DAY=864e5,NOW=Date.now();
+const col=v=>v>=75?'var(--good)':v>=55?'var(--warn)':'var(--bad)';
+const ago=t=>{const m=Math.round((Date.now()-t)/6e4);return m<60?Math.max(m,1)+'m ago':m<1440?Math.round(m/60)+'h ago':Math.round(m/1440)+'d ago'};
+
+/* ---------- Theme toggle ---------- */
+let theme=localStorage.getItem('biz-theme')||'dark';
+function applyTheme(){document.documentElement.setAttribute('data-theme',theme);$('#themeBtn').textContent=theme==='dark'?'☀️':'🌙'}
+applyTheme();
+$('#themeBtn').onclick=()=>{theme=theme==='dark'?'light':'dark';localStorage.setItem('biz-theme',theme);applyTheme()};
+
+/* ---------- Default data ---------- */
+function def(){return{
+  emp:[{n:'Amir',r:'Owner',mfa:1,on:1,t:80},{n:'Nurul',r:'Finance',mfa:1,on:1,t:92},{n:'Faiz',r:'Sales',mfa:0,on:1,t:54},{n:'Siti',r:'Admin',mfa:1,on:1,t:88}],
+  chk:{dmarc:0,spf:1,dkim:1,backup:1,pm:0,upd:1,https:1},
+  tx:[['Supplier A',1200,10],['Supplier A',1350,11],['Utilities',480,9],['Supplier B',2100,14],['Payroll',6200,9]].map((x,i)=>({to:x[0],amt:x[1],h:x[2],ts:NOW-(6-i)*DAY,s:0})),
+  ev:[[6,'phish','med','Phishing drill: 2 staff clicked the test link',1],[5,'fraud','high','Invoice flagged high-risk: supplier bank-detail change',1],[4,'access','med','New device login: Nurul',1],[3,'phish','med','Phishing drill: Faiz needs retraining',1],[2,'access','crit','5 failed logins on admin account',0],[1,'fraud','high','Payment held: unusual hour and new recipient',1]].map(x=>({ts:NOW-x[0]*DAY,cat:x[1],sev:x[2],msg:x[3],res:x[4]})),
+  hist:[68,70,72,71,74],
+  scamHist:[]
+}}
+let S;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!S||!S.emp)S=def();
+if(!S.scamHist)S.scamHist=[];
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const logEv=(cat,sev,msg,res)=>{S.ev.push({ts:Date.now(),cat,sev,msg,res:res?1:0});};
+
+/* ---------- Calc ---------- */
+function calc(){
+  const a=S.emp.filter(e=>e.on),n=a.length||1,c=S.chk;
+  const mfa=a.filter(e=>e.mfa).length/n,dom=(c.dmarc+c.spf+c.dkim)/3,oth=(c.backup+c.pm+c.upd+c.https)/4,tr=a.reduce((s,e)=>s+e.t,0)/n/100;
+  const open=S.ev.filter(e=>!e.res&&(e.sev=='crit'||e.sev=='high')),fin=open.filter(e=>e.cat=='fraud').length;
+  const total=Math.max(0,Math.min(100,Math.round(mfa*35+dom*20+oth*15+tr*20+10-Math.min(open.length*5,25))));
+  return{total,mfa,dom,oth,tr,open,a,areas:[['Email & communications',Math.round((dom*.6+tr*.4)*100)],['Financial operations',Math.max(0,100-fin*20)],['Staff access & devices',Math.round((mfa*.6+tr*.4)*100)],['Hygiene & vendors',Math.round(oth*100)]]}
+}
+const CK=[['dmarc','Domain has DMARC record','Add a TXT record at _dmarc.yourdomain: v=DMARC1; p=quarantine; rua=mailto:you@yourdomain'],['spf','Domain has SPF record','Add a TXT record listing the servers allowed to send your email'],['dkim','Email signing (DKIM) enabled','Turn on DKIM signing in Google Workspace or Microsoft 365 admin'],['backup','Regular data backups','Schedule automatic backups and test a restore once'],['pm','Password manager in use','Give every staff member a password manager'],['upd','Devices & software up to date','Enable automatic updates on all laptops and phones'],['https','Website uses HTTPS','Install a free TLS certificate (e.g. Let\'s Encrypt)']];
+function risks(){
+  const c=S.chk,a=S.emp.filter(e=>e.on),r=[],nm=a.filter(e=>!e.mfa);
+  if(nm.length)r.push(['MFA off: '+nm.map(e=>e.n).join(', '),nm.length*30]);
+  CK.forEach(k=>{if(!c[k[0]])r.push([k[1].replace('Domain has ','Missing ').replace('in use','not in use'),22])});
+  a.filter(e=>e.t<65).forEach(e=>r.push(['Low phishing awareness: '+e.n,100-e.t]));
+  return r.sort((x,y)=>y[1]-x[1])
+}
+
+/* ---------- Incident response playbooks ---------- */
+const PLAYBOOKS={
+  fraud:{title:'🚨 Fraud / Payment Incident',steps:['Do NOT approve or process the payment until fully verified.','Call the recipient on a phone number from your own records — not from the message.','If bank details changed recently, contact your bank fraud line immediately (Maybank: 1-800-88-6688, CIMB: 1-300-880-900).','Log the incident and note the amount, recipient, and time.','If payment already went through, call your bank within the hour and request a recall.','Report to BNMTELELINK at 1-300-88-5465 or bnmtelelink.bnm.gov.my','Document evidence: save the original message or email.']},
+  phish:{title:'🎣 Phishing Incident',steps:['Do NOT click any links or download attachments in the suspicious message.','Forward the message to your IT contact or mark it as phishing in your email client.','If credentials were entered, change the password immediately and enable MFA.','Check if any files were downloaded and run a malware scan.','Notify affected staff and remind them not to reuse passwords.','Report to CyberSecurity Malaysia: cyber999.com or call 1-300-88-2999','Schedule a phishing awareness refresher for your team.']},
+  access:{title:'🔐 Unauthorised Access Incident',steps:['Immediately reset the password for the affected account.','Revoke active sessions from the account security settings.','Enable MFA if it is not already on for that account.','Check login history for any data exports or unusual actions.','If sensitive data was accessed, notify affected parties.','Preserve logs before any reset — they may be needed for investigation.','Review other accounts using the same password.']},
+  crit:{title:'🚨 Critical Security Incident',steps:['Stay calm and do not delete anything — preserve all evidence.','Disconnect the affected device from the network (Wi-Fi off, unplug LAN).','Call CyberSecurity Malaysia CERT: 1-300-88-2999 or cyber999@cybersecurity.my','Contact your bank immediately if financial data may be involved.','Do not pay any ransom without consulting authorities.','Document everything: time noticed, what happened, who was affected.','Review and reset all shared passwords and access credentials.']}
+};
+function showPlaybook(cat){
+  const p=PLAYBOOKS[cat]||PLAYBOOKS.crit;
+  $('#modalTitle').textContent=p.title;
+  $('#modalBody').innerHTML=p.steps.map((s,i)=>'<div class="step"><div class="step-num">'+(i+1)+'</div><div class="step-body">'+esc(s)+'</div></div>').join('');
+  $('#modalBg').classList.add('on');
+}
+$('#modalClose').onclick=()=>$('#modalBg').classList.remove('on');
+$('#modalBg').onclick=e=>{if(e.target===$('#modalBg'))$('#modalBg').classList.remove('on')};
+
+/* ---------- Nav ---------- */
+$$('.nav a').forEach(a=>a.onclick=()=>{$$('.nav a').forEach(x=>x.classList.remove('on'));a.classList.add('on');$$('.scr').forEach(s=>s.classList.remove('on'));$('#'+a.dataset.s).classList.add('on');if(a.dataset.s==='staff')renderStaffCards();if(a.dataset.s==='digest')renderDigest()});
+$('#alerts').addEventListener('click',e=>{
+  const li=e.target.closest('[data-i]');if(!li)return;
+  const i=+li.dataset.i,ev=S.ev[i];
+  if(e.target.classList.contains('resp-btn')){showPlaybook(ev.cat);return;}
+  S.ev[i].res=1;render();
+});
+
+/* ---------- Main render ---------- */
+function render(){
+  const k=calc();
+  if(S.hist[S.hist.length-1]!==k.total){S.hist.push(k.total);S.hist=S.hist.slice(-8)}
+  save();
+  $('#dsub').textContent='Health score '+k.total+'/100 · '+k.a.length+' active staff · updated just now';
+  const days=[...Array(7)].map((_,i)=>S.ev.filter(e=>Math.floor((Date.now()-e.ts)/DAY)==6-i).length);
+  const sp=a=>'<div class="spark">'+a.map(v=>'<i style="height:'+Math.max(12,v/(Math.max(...a)||1)*100)+'%"></i>').join('')+'</div>';
+  const flagged=S.tx.filter(t=>t.s>=65).length,trained=k.a.filter(e=>e.t>=70).length;
+  $('#stats').innerHTML=[['Health score',k.total,sp(S.hist)],['Events logged',S.ev.length,sp(days)],['Staff trained',trained+'/'+k.a.length,''],['Open critical/high',k.open.length,''],['Flagged payments',flagged,'']].map(s=>'<div class="stat"><div class="l">'+s[0]+'</div><div class="n" style="color:'+( s[0]==='Health score'?col(+s[1]):s[0]==='Open critical/high'&&+s[1]>0?'var(--bad)':'var(--ink)')+'">'+s[1]+'</div>'+s[2]+'</div>').join('');
+  $('#areas').innerHTML=k.areas.map(a=>'<div class="row"><div class="t"><span>'+a[0]+'</span><span style="color:'+col(a[1])+'">'+a[1]+'/100</span></div><div class="tr"><i style="width:'+a[1]+'%;background:'+col(a[1])+'"></i></div></div>').join('');
+  const cats=[['fraud','#ef4b5f'],['phish','#f5a623'],['access','#4d8dff']],cnt=c=>[...Array(7)].map((_,i)=>S.ev.filter(e=>e.cat==c&&Math.floor((Date.now()-e.ts)/DAY)==6-i).length),mx=Math.max(2,...cats.flatMap(c=>cnt(c[0])));
+  $('#chart').innerHTML=cats.map(c=>'<polyline fill="none" stroke="'+c[1]+'" stroke-width="2" points="'+cnt(c[0]).map((v,i)=>(i*50)+','+(125-v/mx*105)).join(' ')+'"/>').join('');
+  const rs=risks();
+  $('#risks').innerHTML=rs.length?rs.slice(0,5).map(r=>'<div class="row"><div class="t"><span>'+esc(r[0])+'</span></div><div class="tr"><i style="width:'+Math.min(r[1],100)+'%;background:var(--bad)"></i></div></div>').join(''):'<div class="mut">Nothing urgent. Nice work.</div>';
+  const ev=S.ev.map((e,i)=>({e,i})).sort((a,b)=>b.e.ts-a.e.ts).slice(0,6);
+  $('#alerts').innerHTML=ev.map(x=>'<div class="li" data-i="'+x.i+'" style="cursor:pointer;opacity:'+(x.e.res?.55:1)+'"><span>'+esc(x.e.msg)+'<br><span class="mut" style="margin:0">'+ago(x.e.ts)+'</span></span><span style="display:flex;gap:6px;align-items:center">'+(x.e.res?'':'<button class="btn sm resp-btn" style="font-size:10.5px;padding:3px 7px">Respond</button>')+'<span class="pill '+(x.e.res?'ok':x.e.sev)+'">'+(x.e.res?'Resolved':x.e.sev)+'</span></span></div>').join('');
+  $('#elist').innerHTML=S.emp.map((e,i)=>'<div class="li" style="opacity:'+(e.on?1:.5)+'"><span><b>'+esc(e.n)+'</b> · '+esc(e.r)+' <span class="mut" style="margin:0">· training '+e.t+'</span></span><span style="display:flex;gap:10px;align-items:center">'+(e.on?'<span class="mut" style="margin:0">MFA</span><button class="sw '+(e.mfa?'on':'')+'" data-mfa="'+i+'"></button><button class="btn g sm" data-off="'+i+'">Offboard</button>':'<span class="pill bad">Access revoked</span><button class="btn g sm" data-off="'+i+'">Restore</button>')+'</span></div>').join('');
+  $('#temp').innerHTML=S.emp.filter(e=>e.on).map(e=>'<option>'+esc(e.n)+'</option>').join('');
+  const pass=CK.filter(c=>S.chk[c[0]]).length;
+  $('#cbar').style.width=pass/CK.length*100+'%';
+  $('#cpm').textContent=pass+' of '+CK.length+' checks passed. Not a certification, just a practical readiness list.';
+  $('#clist').innerHTML=CK.map(c=>'<div class="li"><span>'+c[1]+(S.chk[c[0]]?'':'<br><span class="mut" style="margin:0">Fix: '+c[2]+'</span>')+'</span><button class="sw '+(S.chk[c[0]]?'on':'')+'" data-ck="'+c[0]+'"></button></div>').join('');
+  $('#fhist').innerHTML=S.tx.slice().reverse().slice(0,8).map(t=>'<div class="li"><span>'+esc(t.to)+' · RM'+Number(t.amt).toLocaleString()+'<br><span class="mut" style="margin:0">'+new Date(t.ts).toLocaleString()+'</span></span><span class="pill '+(t.s>=65?'crit':t.s>=35?'high':'ok')+'">'+(t.held?'Held · ':'')+t.s+'/100</span></div>').join('');
+  const bad=k.a.filter(e=>!e.mfa).length;
+  $('#rbody').innerHTML='<div class="big">'+k.total+'/100 <span class="pill '+(k.total>=75?'ok':k.total>=55?'high':'crit')+'">'+(k.total>=75?'Good':k.total>=55?'Needs work':'At risk')+'</span></div><div class="mut" style="margin-top:6px">Generated '+new Date().toLocaleDateString()+'</div>'+k.areas.map(a=>'<div class="li"><span>'+a[0]+'</span><span>'+a[1]+'/100</span></div>').join('')+'<div class="li"><span>Staff with MFA</span><span>'+(k.a.length-bad)+'/'+k.a.length+'</span></div><div class="li"><span>Hygiene checks passed</span><span>'+pass+'/'+CK.length+'</span></div><div class="li"><span>Incidents resolved</span><span>'+S.ev.filter(e=>e.res).length+'/'+S.ev.length+'</span></div><div class="li"><span>Open items</span><span>'+(rs.length?rs.slice(0,3).map(r=>esc(r[0])).join('; '):'None')+'</span></div>';
+  renderScamHist();
+}
+
+/* ---------- Staff report cards ---------- */
+function renderStaffCards(){
+  const k=calc();
+  $('#staffCards').innerHTML=S.emp.map((e,i)=>{
+    const inc=S.ev.filter(ev=>ev.msg.includes(e.n)).length;
+    const ringCol=e.t>=75?'var(--good)':e.t>=55?'var(--warn)':'var(--bad)';
+    const lastTrain=S.ev.filter(ev=>ev.cat==='phish'&&ev.msg.includes(e.n)).sort((a,b)=>b.ts-a.ts)[0];
+    return '<div class="card">'
+      +'<div class="name">'+esc(e.n)+'</div>'
+      +'<div class="role">'+esc(e.r)+'</div>'
+      +'<div class="score-ring" style="border-color:'+ringCol+';color:'+ringCol+'">'+e.t+'</div>'
+      +'<div style="font-size:12px;display:flex;flex-direction:column;gap:5px">'
+      +'<div style="display:flex;justify-content:space-between"><span class="mut">Status</span><span class="pill '+(e.on?'ok':'bad')+'">'+(e.on?'Active':'Offboarded')+'</span></div>'
+      +'<div style="display:flex;justify-content:space-between"><span class="mut">MFA</span><span class="pill '+(e.mfa?'ok':'crit')+'">'+(e.mfa?'Enabled':'Off')+'</span></div>'
+      +'<div style="display:flex;justify-content:space-between"><span class="mut">Training score</span><span style="color:'+ringCol+'">'+e.t+'/100</span></div>'
+      +'<div style="display:flex;justify-content:space-between"><span class="mut">Incidents</span><span>'+(inc||'None')+'</span></div>'
+      +(lastTrain?'<div style="display:flex;justify-content:space-between"><span class="mut">Last drill</span><span>'+ago(lastTrain.ts)+'</span></div>':'')
+      +'</div>'
+      +'</div>';
+  }).join('');
+}
+
+/* ---------- Weekly digest ---------- */
+function renderDigest(){
+  const k=calc();
+  const weekAgo=Date.now()-7*DAY;
+  const newEv=S.ev.filter(e=>e.ts>weekAgo);
+  const resolved=newEv.filter(e=>e.res).length;
+  const open=newEv.filter(e=>!e.res&&(e.sev==='crit'||e.sev==='high')).length;
+  const scamChecks=(S.scamHist||[]).filter(h=>h.ts>weekAgo).length;
+  const highRisk=(S.scamHist||[]).filter(h=>h.ts>weekAgo&&h.score>=65).length;
+  const prevScore=S.hist.length>=2?S.hist[S.hist.length-2]:k.total;
+  const scoreDiff=k.total-prevScore;
+  const trainedStaff=S.emp.filter(e=>e.on&&e.t>=70).length;
+  const rs=risks();
+  $('#digestBody').innerHTML=
+    '<div class="pn digest-section">'
+    +'<h4>Security score</h4>'
+    +'<div class="change-row"><span>Current score</span><span style="font-weight:700;color:'+col(k.total)+'">'+k.total+'/100</span></div>'
+    +'<div class="change-row"><span>Change this week</span><span class="'+(scoreDiff>0?'up':scoreDiff<0?'down':'mut')+'">'+(scoreDiff>0?'↑ +':scoreDiff<0?'↓ ':'→ ')+scoreDiff+' pts</span></div>'
+    +'</div>'
+    +'<div class="pn digest-section">'
+    +'<h4>Incidents this week</h4>'
+    +'<div class="change-row"><span>New events</span><span>'+newEv.length+'</span></div>'
+    +'<div class="change-row"><span>Resolved</span><span class="up">'+resolved+'</span></div>'
+    +'<div class="change-row"><span>Still open (critical/high)</span><span class="'+(open>0?'down':'up')+'">'+open+'</span></div>'
+    +'</div>'
+    +'<div class="pn digest-section">'
+    +'<h4>Scam checker</h4>'
+    +'<div class="change-row"><span>Messages checked</span><span>'+scamChecks+'</span></div>'
+    +'<div class="change-row"><span>High-risk detections</span><span class="'+(highRisk>0?'down':'up')+'">'+highRisk+'</span></div>'
+    +'</div>'
+    +'<div class="pn digest-section">'
+    +'<h4>Team</h4>'
+    +'<div class="change-row"><span>Staff trained (score ≥70)</span><span>'+trainedStaff+' / '+S.emp.filter(e=>e.on).length+'</span></div>'
+    +'<div class="change-row"><span>MFA enabled</span><span>'+S.emp.filter(e=>e.on&&e.mfa).length+' / '+S.emp.filter(e=>e.on).length+'</span></div>'
+    +'</div>'
+    +'<div class="pn digest-section">'
+    +'<h4>Top actions to take this week</h4>'
+    +(rs.length?rs.slice(0,4).map((r,i)=>'<div class="change-row"><span>'+esc(r[0])+'</span><span class="pill crit">Fix</span></div>').join(''):'<div class="change-row"><span>No urgent actions — keep it up!</span><span class="pill ok">✓</span></div>')
+    +'</div>';
+}
+
+/* ---------- Scam history ---------- */
+function saveScamCheck(text,score,hits){
+  if(!S.scamHist)S.scamHist=[];
+  S.scamHist.unshift({ts:Date.now(),text:text.slice(0,120),score,hits:hits.map(h=>h[0]).slice(0,3)});
+  S.scamHist=S.scamHist.slice(0,30);
+  save();
+  renderScamHist();
+}
+function renderScamHist(){
+  if(!S.scamHist||!S.scamHist.length){$('#scamHist').innerHTML='<div class="mut">No checks saved yet.</div>';return;}
+  $('#scamHist').innerHTML=S.scamHist.map((h,i)=>{
+    const lv=h.score>=65?['High risk','crit']:h.score>=35?['Suspicious','high']:['Low risk','ok'];
+    return '<div class="hist-item"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(h.text)+(h.text.length>=120?'…':'')+'</span><span style="display:flex;gap:6px;align-items:center;flex-shrink:0"><span class="pill '+lv[1]+'">'+h.score+'/100 '+lv[0]+'</span><button class="btn g sm" data-del="'+i+'" style="font-size:10.5px;padding:2px 7px">✕</button></span></div>'
+      +(h.hits&&h.hits.length?'<div style="margin-top:3px">'+h.hits.map(f=>'<span class="chip" style="font-size:10px">'+esc(f)+'</span>').join('')+'</div>':'')
+      +'<div class="mut" style="margin-top:2px">'+ago(h.ts)+'</div>'
+      +'</div>';
+  }).join('');
+}
+$('#clearHist').onclick=()=>{S.scamHist=[];save();renderScamHist()};
+document.addEventListener('click',e=>{
+  const d=e.target.dataset.del;
+  if(d!==undefined&&e.target.closest('#scamHist')){S.scamHist.splice(+d,1);save();renderScamHist()}
+});
+
+/* ---------- Scam checker ---------- */
+const RULES=[[/(bank (account|details?)|akaun bank|no\.? akaun)[^.]{0,40}(chang|new|updat|tukar|baru)|(chang|new|updat|tukar)[^.]{0,30}(bank (account|details?)|akaun)/gi,50,'Bank-detail change request'],[/\b(urgent|immediately|asap|within \d+ ?(hours?|hrs?|minutes?)|before \d+ ?(pm|am)|today only|segera|dalam masa \d+ ?(jam|minit)|final notice|last warning)/gi,25,'Urgency pressure'],[/\b(make payment|transfer|remit|bayar|pindahkan)\b/gi,15,'Payment request'],[/\b(otp|tac|password|kata laluan|cvv|login details?|verify your account|sahkan akaun)\b/gi,35,'Asks for credentials or OTP'],[/\b(lhdn|ssm|pdrm|bank negara|bnm|jpj|kwsp|epf|socso|perkeso|mcmc|polis)\b/gi,18,'Impersonates an authority'],[/(summons|saman|arrest|waran|freeze|frozen|dibekukan|disekat|suspended|legal action|tindakan undang)/gi,25,'Threat or pressure'],[/\b(you have won|prize|hadiah|lucky draw|congratulations|tahniah|refund)\b/gi,22,'Too-good-to-be-true offer'],[/(parcel|pos laju|j&t|dhl|courier)[^.]{0,70}(fee|pay|bayar|held|customs)/gi,28,'Courier-fee scam pattern'],[/(https?:\/\/)?(bit\.ly|tinyurl\.com|t\.co|cutt\.ly|rb\.gy|is\.gd)\/\S+/gi,28,'Shortened link hides destination'],[/https?:\/\/\d{1,3}(\.\d{1,3}){3}\S*/gi,32,'Link to a raw IP address'],[/\b[\w-]+\.(exe|apk|scr|js|zip)\b/gi,28,'Risky attachment type'],[/\b(dear (customer|sir|madam|user|valued)|pelanggan yang dihormati)/gi,12,'Generic greeting'],[/(do not tell|jangan beritahu|keep this confidential|rahsia)/gi,20,'Asks for secrecy'],[/(gandakan|double your (money|deposit)|pulangan (tunai|terjamin)|guaranteed returns?|\d{2,3}% ?(return|pulangan|profit|untung)|untung (pasti|terjamin))/gi,35,'Guaranteed-return / investment promise'],[/(bonus deposit|deposit bonus|tuntut bonus|claim your bonus|free credit|kredit percuma)/gi,28,'Deposit-bonus bait'],[/(jangan lepaskan|don'?t miss (out|this)|peluang terakhir|limited slots|tempat terhad)/gi,20,'Fear-of-missing-out pressure'],[/\b[a-z0-9]{1,4}\.(pro|co|to|ly|gl|cc|me)\/\S+/gi,22,'Short unfamiliar link']];
+const BR={maybank:'maybank2u.com.my',cimb:'cimbclicks.com.my',rhb:'rhbgroup.com',publicbank:'pbebank.com',hasil:'hasil.gov.my',lhdn:'hasil.gov.my',paypal:'paypal.com',shopee:'shopee.com.my',lazada:'lazada.com.my',poslaju:'pos.com.my',grab:'grab.com'};
+const BADTLD=/\.(xyz|top|click|icu|vip|info|work|buzz|cfd|sbs)\b/i;
+function analyze(text){
+  const hits=[],spans=[];
+  RULES.forEach(r=>{let m,g=new RegExp(r[0].source,'gi'),f=false;while((m=g.exec(text))){spans.push([m.index,m.index+m[0].length]);f=true;if(m[0].length==0)g.lastIndex++}if(f)hits.push([r[2],r[1]])});
+  const dm=text.match(/[a-z0-9][a-z0-9.-]*\.[a-z]{2,}(\.[a-z]{2})?/gi)||[];
+  dm.forEach(d=>{const dl=d.toLowerCase();Object.keys(BR).forEach(b=>{if(dl.includes(b)&&dl!==BR[b]&&!dl.endsWith('.'+BR[b])&&!hits.some(h=>h[0].includes(dl))){hits.push(['Lookalike domain: '+dl+' (real: '+BR[b]+')',45]);const i=text.toLowerCase().indexOf(dl);spans.push([i,i+dl.length])}});if(BADTLD.test(dl)&&!hits.some(h=>h[0].includes(dl))){hits.push(['Suspicious domain ending: '+dl,25]);const i=text.toLowerCase().indexOf(dl);spans.push([i,i+dl.length])}});
+  let p=1;hits.forEach(h=>p*=1-h[1]/100);const score=Math.min(98,Math.round((1-p)*100));
+  spans.sort((a,b)=>a[0]-b[0]);let out='',pos=0;spans.forEach(s=>{if(s[0]>=pos){out+=esc(text.slice(pos,s[0]))+'<mark>'+esc(text.slice(s[0],s[1]))+'</mark>';pos=s[1]}});out+=esc(text.slice(pos));
+  return{score,hits,html:out}
+}
+const EX=["Dear Amir, please note our bank account has changed. Kindly make payment of RM12,400 to the new account before 5pm today to avoid late fees. Update from finance@maybank2u-secure.top","Pos Laju: Your parcel is held. Pay RM2.90 customs fee within 24 hours at bit.ly/pl-redeliver or it will be returned.","LHDN NOTICE: tax arrears detected. Pay now at lhdn-refund.top/pay. Failure to pay will result in your bank account being frozen. Jangan beritahu sesiapa.","Hi Amir, attached is invoice #2291 for the March printing order, RM1,350, due in 30 days as usual. Thanks, Supplier A accounts."];
+$('#cgo').onclick=()=>{
+  const t=$('#ctext').value.trim();if(!t)return;
+  const r=analyze(t),lv=r.score>=65?['High risk','crit']:r.score>=35?['Suspicious','high']:['Low risk','ok'];
+  if(r.score>=65){logEv('fraud','high','Message flagged high-risk ('+r.score+'/100)',0);render()}
+  saveScamCheck(t,r.score,r.hits);
+  const adv=r.score>=65?'Do not pay, click or reply. Call the sender on a number you already have, not one from the message. Report scams to the National Scam Response Centre on 997.':r.score>=35?'Verify before acting: confirm through a second channel (phone or a known contact).':'No strong scam patterns found, but stay alert for unexpected payment requests.';
+  $('#cout').innerHTML='<div class="res" style="border-color:'+(r.score>=65?'var(--bad)':r.score>=35?'var(--warn)':'var(--good)')+'"><div class="big">'+r.score+'/100 <span class="pill '+lv[1]+'">'+lv[0]+'</span></div><div>'+(r.hits.length?r.hits.map(h=>'<span class="chip">'+esc(h[0])+'</span>').join(''):'<span class="mut">No red flags detected.</span>')+'</div><div class="mail" style="margin-top:10px;line-height:1.6">'+r.html+'</div><p style="margin:10px 0 8px">'+adv+'</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn g sm" id="ask">Ask the assistant about this</button> <button class="btn sm" id="aib">AI second opinion</button>'+(r.score>=65?'<button class="btn red sm" id="irb">📋 Response guide</button>':'')+'</div><div id="aiout"></div></div>';
+  $('#ask').onclick=()=>{openChat();ask('A message scored '+r.score+'/100 with these flags: '+(r.hits.map(h=>h[0]).join('; ')||'none')+'. What should I do?')};
+  $('#aib').onclick=()=>aiCheck(t,r);
+  if(r.score>=65){const irb=$('#irb');if(irb)irb.onclick=()=>showPlaybook('fraud')}
+};
+async function aiCheck(t,r){
+  const o=$('#aiout');o.innerHTML='<p class="mut">Asking the AI…</p>';
+  try{
+    const res=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t})});
+    if(!res.ok)throw new Error('x');const d=await res.json();
+    const c=d.verdict==='scam'?['crit','Likely scam']:d.verdict==='suspicious'?['high','Suspicious']:['ok','Looks safe'];
+    const dis=(d.verdict==='scam'&&r.score<35)?'<p style="color:var(--warn);margin:8px 0 0">The rules missed this one but the AI caught it. That is why both are used together.</p>':'';
+    o.innerHTML='<div class="res" style="margin-top:10px;border-color:var(--accent)"><b>AI second opinion:</b> <span class="pill '+c[0]+'">'+c[1]+'</span> <span class="mut" style="margin:0">'+esc(d.confidence||'')+' confidence</span>'+dis+'<ul style="margin:8px 0 0;padding-left:18px">'+(d.reasons||[]).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><p style="margin:8px 0 0">'+esc(d.advice||'')+'</p></div>';
+    if(d.verdict==='scam'){logEv('fraud','high','AI flagged a message as a likely scam',0);render()}
+  }catch(e){o.innerHTML='<p class="mut">AI unavailable right now (is the server running with a valid key?). The rule-based result above still applies.</p>'}
+}
+$$('[data-ex]').forEach(b=>b.onclick=()=>{$('#ctext').value=EX[b.dataset.ex];$('#cgo').click()});
+
+/* ---------- Financial ---------- */
+function pad(n){return String(n).padStart(2,'0')}
+function dtl(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes())}
+$('#fdt').value=dtl(new Date());let pend=null;
+function txScore(t){
+  const r=[];let s=0,P=S.tx;
+  if(!P.some(x=>x.to.toLowerCase()==t.to.toLowerCase())){s+=30;r.push('New recipient')}
+  const avg=P.reduce((a,x)=>a+x.amt,0)/(P.length||1);
+  if(t.amt>avg*3){s+=35;r.push(Math.round(t.amt/avg*10)/10+'× your average payment')}else if(t.amt>avg*2){s+=18;r.push('More than 2× your average payment')}
+  if(t.h<5||t.h>=23){s+=20;r.push('Unusual hour ('+pad(t.h)+':00)')}
+  if(t.chg){s+=30;r.push('Recipient bank details recently changed')}
+  if(P.filter(x=>Math.abs(x.ts-t.ts)<36e5).length>=2){s+=15;r.push('Rapid repeat payments')}
+  return{s:Math.min(s,99),r}
+}
+$('#fgo').onclick=()=>{
+  const d=new Date($('#fdt').value||Date.now()),t={to:$('#fto').value.trim()||'Unknown',amt:+$('#famt').value||0,h:d.getHours(),ts:d.getTime(),chg:+$('#fchg').value},k=txScore(t);t.s=k.s;pend=t;
+  const lv=k.s>=65?['HIGH RISK','crit']:k.s>=35?['REVIEW','high']:['LOOKS NORMAL','ok'];
+  $('#fout').innerHTML='<div class="res" style="border-color:'+(k.s>=65?'var(--bad)':k.s>=35?'var(--warn)':'var(--good)')+'"><div class="big">RM'+t.amt.toLocaleString()+' to '+esc(t.to)+' <span class="pill '+lv[1]+'">'+lv[0]+' · '+k.s+'/100</span></div><div>'+(k.r.length?k.r.map(x=>'<span class="chip">'+esc(x)+'</span>').join(''):'<span class="mut">Matches your usual pattern.</span>')+'</div><div style="margin-top:10px;display:flex;gap:8px"><button class="btn" id="fapp">'+(k.s>=65?'Hold &amp; create incident':'Approve &amp; record')+'</button>'+(k.s>=65?'<button class="btn g" id="firb">📋 Response guide</button>':'')+'</div></div>';
+  $('#fapp').onclick=()=>{if(k.s>=65){t.held=1;logEv('fraud','crit','Payment held: RM'+t.amt.toLocaleString()+' to '+t.to+' ('+k.r.join(', ')+')',0)}S.tx.push(t);pend=null;$('#fout').innerHTML='<div class="mut" style="margin-top:10px">'+(k.s>=65?'Payment held and security incident created.':'Payment recorded.')+'</div>';render()};
+  if(k.s>=65){const fb=$('#firb');if(fb)fb.onclick=()=>showPlaybook('fraud')}
+};
+$('#fdemo').onclick=()=>{const d=new Date();d.setHours(2,43,0,0);$('#fto').value='Supplier C';$('#famt').value=8500;$('#fdt').value=dtl(d);$('#fchg').value='1';$('#fgo').click()};
+
+/* ---------- Training ---------- */
+const SC=[[['From: ',-1],['finance@maybank2u-secure.top',1,'Lookalike domain. The real Maybank site is maybank2u.com.my'],['\nSubject: ',-1],['Invoice #2291',0,'Decoy: an invoice number is normal'],[' – ',-1],['URGENT: our bank details have changed',1,'Urgency plus a bank-detail change is the classic invoice-fraud combo'],['\n\n',-1],['Dear valued customer,',1,'Generic greeting. A real supplier uses your name'],['\nPlease transfer RM12,400 ',-1],['before 5pm today',1,'Artificial deadline to stop you checking'],[' to the new account. Reply to confirm.\n\n',-1],['Regards, Accounts Department',0,'Decoy: a normal signature']],
+[[['Pos Laju: ',-1],['Your parcel MY2291044 is held.',0,'Decoy: tracking-style text alone is normal'],[' ',-1],['Pay RM2.90 customs fee',1,'Couriers do not ask for card payment by SMS'],[' within 24 hours at ',-1],['bit.ly/pl-redeliver',1,'Shortened link hides the real destination'],[' or it will be returned.',1,'Pressure to act quickly']]][0],
+[['LHDN NOTICE: ',-1],['tax arrears detected',1,'Authority impersonation. LHDN does not demand payment by SMS'],['. Reference LHDN/2026/1182. ',0,'Decoy: reference numbers look official but prove nothing either way'],['Pay now at lhdn-refund.top/pay',1,'Not hasil.gov.my, and a .top ending'],[' or your ',-1],['bank account will be frozen.',1,'Threat to force a rushed decision']]];
+let sel=new Set(),done=false;
+function drawMail(){const sc=SC[+$('#tsc').value];$('#tmail').innerHTML=sc.map((s,i)=>s[1]===-1?esc(s[0]):'<span class="seg" data-k="'+i+'">'+esc(s[0])+'</span>').join('');sel=new Set();done=false;$('#tout').innerHTML=''}
+$('#tsc').onchange=drawMail;
+$('#tmail').onclick=e=>{const s=e.target.closest('.seg');if(!s||done)return;const k=+s.dataset.k;sel.has(k)?sel.delete(k):sel.add(k);s.classList.toggle('sel')};
+$('#tgo').onclick=()=>{
+  if(done)return;done=true;
+  const sc=SC[+$('#tsc').value],real=sc.map((s,i)=>[s,i]).filter(x=>x[0][1]===1);
+  let hit=0,wrong=0;
+  const miss=[];
+  real.forEach(x=>{
+    const el=$('[data-k="'+x[1]+'"]');
+    if(sel.has(x[1])){hit++;el.classList.add('hit')}else{miss.push(x[0][0]);el.classList.add('miss')}
+  });
+  sel.forEach(k=>{
+    const seg=sc[k];if(!seg||seg[1]!==1){wrong++;const el=$('[data-k="'+k+'"]');if(el)el.classList.add('wrong')}
+  });
+  const score=Math.max(0,Math.round((hit-wrong*0.5)/real.length*100));
+  const emp=S.emp.find(e=>e.n===$('#temp').value);
+  if(emp){
+    emp.t=Math.round(emp.t*.7+score*.3);
+    logEv('phish',score<50?'high':'med','Phishing drill: '+emp.n+' scored '+score+'%',score>=70);
+    render();
+  }
+  const tips=miss.map(m=>{const f=real.find(x=>x[0][0]===m);return f?'<li><b>'+esc(f[0][0].trim().slice(0,40))+'</b> — '+esc(f[0][2])+'</li>':''}).join('');
+  $('#tout').innerHTML='<div class="res" style="border-color:'+(score>=70?'var(--good)':score>=50?'var(--warn)':'var(--bad)')+'"><div class="big">'+score+'/100</div><p>'+(score>=70?'Good awareness! '+hit+' of '+real.length+' red flags spotted.':score>=50?hit+' of '+real.length+' red flags found. Review the missed ones below.':'Needs work — only '+hit+' of '+real.length+' red flags spotted.')+'</p>'+(tips?'<ul style="margin:8px 0;padding-left:18px;font-size:12px">'+tips+'</ul>':'')+'</div>';
+};
+drawMail();
+
+/* ---------- Team ---------- */
+$('#elist').addEventListener('click',e=>{
+  const mi=e.target.dataset.mfa,oi=e.target.dataset.off;
+  if(mi!==undefined){S.emp[+mi].mfa=S.emp[+mi].mfa?0:1;logEv('access',S.emp[+mi].mfa?'med':'high',(S.emp[+mi].mfa?'MFA enabled':'MFA disabled')+': '+S.emp[+mi].n,1);render()}
+  if(oi!==undefined){S.emp[+oi].on=S.emp[+oi].on?0:1;logEv('access','med',(S.emp[+oi].on?'Access restored':'Access revoked')+': '+S.emp[+oi].n,1);render()}
+});
+$('#nadd').onclick=()=>{
+  const n=$('#nn').value.trim(),r=$('#nr').value.trim();
+  if(!n)return;S.emp.push({n,r:r||'Staff',mfa:0,on:1,t:50});
+  logEv('access','med','New employee added: '+n,1);
+  $('#nn').value='';$('#nr').value='';render();
+};
+
+/* ---------- Compliance ---------- */
+$('#clist').addEventListener('click',e=>{
+  const k=e.target.dataset.ck;
+  if(k){S.chk[k]=S.chk[k]?0:1;logEv('access','med','Compliance toggle: '+k+' set to '+(S.chk[k]?'on':'off'),1);render()}
+});
+
+/* ---------- AI Chat ---------- */
+let chatHistory=[];
+function openChat(){$('#chat').classList.add('on')}
+$('#fab').onclick=()=>$('#chat').classList.toggle('on');
+async function ask(q){
+  const cb=$('#cb');
+  cb.innerHTML+='<div class="m u">'+esc(q)+'</div>';
+  const typing='<div class="m b" id="typing">…</div>';cb.innerHTML+=typing;cb.scrollTop=cb.scrollHeight;
+  const k=calc(),rs=risks(),ctx='Health score: '+k.total+'/100. Open issues: '+k.open.length+'. Top risks: '+(rs.slice(0,3).map(r=>r[0]).join(', ')||'none')+'. MFA coverage: '+Math.round(k.mfa*100)+'%. Domain security: '+Math.round(k.dom*100)+'%.';
+  chatHistory.push(['Owner',q]);
+  try{
+    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,context:ctx,history:chatHistory.slice(-6)})});
+    const d=await r.json();const ans=d.text||d.error||'No response.';
+    chatHistory.push(['Bot',ans]);
+    $('#typing').outerHTML='<div class="m b">'+esc(ans)+'</div>';
+  }catch(e){$('#typing').outerHTML='<div class="m b">Server not running. Start the server with <code>node server.js</code> and try again.</div>'}
+  cb.scrollTop=cb.scrollHeight;
+}
+$('#csend').onclick=()=>{const v=$('#cin').value.trim();if(!v)return;$('#cin').value='';ask(v)};
+$('#cin').onkeydown=e=>{if(e.key==='Enter')$('#csend').click()};
+$$('#sug button').forEach(b=>b.onclick=()=>ask(b.textContent));
+
+/* ---------- Boot ---------- */
+render();
+renderScamHist();
+</script>
+</body>
+</html>
