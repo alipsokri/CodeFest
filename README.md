@@ -184,13 +184,7 @@ BizGuard is built specifically for the Malaysian SME market:
 - References local authorities: LHDN, SSM, PDRM, BNM, KWSP, MCMC
 - Includes real Malaysian hotlines: NSRC 997, BNM 1-300-88-5465, CyberSecurity Malaysia 1-300-88-2999
 - Recognises Malaysian banks and courier services in lookalike domain detection
-
----
-
-## 📄 License
-
-MIT License. See `LICENSE` for details.
-
+  
 ---
 
 Built for CodeFest 🏆
