@@ -78,58 +78,6 @@ BizGuard addresses this by providing a single platform that covers all four gaps
 | Storage | Browser localStorage (client-side persistence) |
 | Styling | CSS custom properties with dark/light mode support |
 
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js v18 or higher
-- A Google AI Studio API key ([get one free at aistudio.google.com](https://aistudio.google.com))
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/YOUR_USERNAME/bizguard-ai.git
-cd bizguard-ai
-
-# Install dependencies
-npm install
-
-# Set up environment variables
-cp .env.example .env
-# Edit .env and add your OPENAI_API_KEY
-```
-
-### Running locally
-
-```bash
-node server.js
-```
-
-Open your browser at **http://localhost:3000**
-
----
-
-## ⚙️ Environment Variables
-
-Create a `.env` file in the root directory based on `.env.example`:
-
-```env
-OPENAI_API_KEY=your_google_ai_studio_api_key_here
-BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/
-PORT=3000
-MODEL=gemini-flash-latest
-```
-
-| Variable | Required | Description |
-|---|---|---|
-| `OPENAI_API_KEY` | Yes | Your Google AI Studio API key |
-| `BASE_URL` | Yes | Gemini OpenAI-compatible endpoint |
-| `PORT` | No | Server port (default: 3000) |
-| `MODEL` | No | Gemini model to use (default: gemini-flash-latest) |
-
-> ⚠️ Never commit your `.env` file. It is listed in `.gitignore`.
 
 ---
 
@@ -141,39 +89,10 @@ bizguard-ai/
 │   └── index.html        # Full frontend (dashboard, all tabs, AI chat)
 ├── server.js             # Express server — /api/chat and /api/analyze
 ├── .env                  # Environment variables (not committed)
-├── .env.example          # Template for environment variables
 ├── .gitignore
 ├── package.json
 └── README.md
 ```
-
----
-
-## 🌐 Deploying to Production
-
-BizGuard can be deployed to any Node.js hosting platform with zero code changes.
-
-**Recommended: Railway**
-1. Push to GitHub
-2. Go to [railway.app](https://railway.app) → New Project → Deploy from GitHub
-3. Add environment variables in the Railway dashboard
-4. Get a public URL automatically
-
-**Alternative: Render**
-1. Push to GitHub
-2. Go to [render.com](https://render.com) → New Web Service
-3. Build command: `npm install`
-4. Start command: `node server.js`
-5. Add environment variables and deploy
-
----
-
-## 🔒 Security Notes
-
-- The Google AI Studio API key is stored server-side only and never exposed to the browser
-- All scam analysis input is treated as untrusted data
-- The AI prompt explicitly instructs the model to ignore any instructions embedded in user-submitted messages
-- No user data is sent to any third-party service other than OpenAI for analysis
 
 ---
 
@@ -187,4 +106,4 @@ BizGuard is built specifically for the Malaysian SME market:
   
 ---
 
-Built for CodeFest 🏆
+Open your BizGuard at **https://bizguard-rorr.onrender.com/**
